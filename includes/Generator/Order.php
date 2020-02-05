@@ -36,7 +36,18 @@ class Order extends Generator {
 
 		foreach ( $products as $product ) {
 			$quantity = self::$faker->numberBetween( 1, 10 );
-			$order->add_product( $product, $quantity );
+			$order_item_id = $order->add_product( $product, $quantity );
+
+			// Add PRDD Order Item Meta
+			$name = get_option( 'delivery_item-meta-date' );
+
+			$prdd_args = array(
+				'date-start' => $assoc_args['prdd-date-start'],
+				'date-end'   => $assoc_args['prdd-date-end']
+			);
+
+			wc_add_order_item_meta( $order_item_id, $name, self::get_date_created( $prdd_args ) );
+			wc_add_order_item_meta( $order_item_id, '_prdd_date', self::get_date_created( $prdd_args ) );
 		}
 
 		$order->set_customer_id( $customer->get_id() );
